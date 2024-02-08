@@ -14,47 +14,44 @@ from PIL import ImageFont
 from pycaption import SRTReader
 from tqdm import tqdm
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--video", type=str, required=True)
-    parser.add_argument("--out", type=str, required=True)
-    parser.add_argument("--srt", type=str, required=True)
-    parser.add_argument("--font", type=str, default="/System/Library/Fonts/HelveticaNeue.ttc")
-    parser.add_argument("--font-size", type=int, default=36)
-    parser.add_argument("--font-index", type=int, default=10)
-    parser.add_argument("--font-italic-index", type=int, default=11)
-    parser.add_argument("--secondary-font-index", type=int, default=10)
-    parser.add_argument("--secondary-font-italic-index", type=int, default=11)
-    parser.add_argument("--secondary-font-size", type=int, default=52)
-    parser.add_argument("--secondary-font-start", type=int, default=432)
-    parser.add_argument("--secondary-font-end", type=int, default=448)
-    parser.add_argument("--bottom-space", type=int, default=36)
 
-    parser.add_argument("--blueback", action="store_true", default=False)
-    parser.add_argument("--pixelformat", type=str, default="yuv422p10le")
-    parser.add_argument(
-        "--quality", type=int, default=10, help="The quality measure of the output video. It should be within 0 to 10."
-    )
-    parser.add_argument(
-        "--bitrate",
-        type=int,
-        default=None,
-        help="The bitrate in b/s of the output video. The default is None (--quality is used).",
-    )
-    parser.add_argument(
-        "--skip-first", action="store_true", default=False, help="If it is True, the first caption will be skipped."
-    )
-    parser.add_argument(
-        "--break-after", type=float, default=0, help="Enable test mode to finish after the given seconds."
-    )
-    parser.add_argument("--output-params", type=str)
-    args = parser.parse_args()
+parser = argparse.ArgumentParser()
+parser.add_argument("--font", type=str, default="/System/Library/Fonts/HelveticaNeue.ttc")
+parser.add_argument("--font-size", type=int, default=36)
+parser.add_argument("--font-index", type=int, default=10)
+parser.add_argument("--font-italic-index", type=int, default=11)
+parser.add_argument("--secondary-font-index", type=int, default=10)
+parser.add_argument("--secondary-font-italic-index", type=int, default=11)
+parser.add_argument("--secondary-font-size", type=int, default=52)
+parser.add_argument("--secondary-font-start", type=int, default=432)
+parser.add_argument("--secondary-font-end", type=int, default=448)
+parser.add_argument("--bottom-space", type=int, default=36)
+parser.add_argument("--blueback", action="store_true", default=False)
+parser.add_argument("--pixelformat", type=str, default="yuv422p10le")
+parser.add_argument(
+    "--quality", type=int, default=10, help="The quality measure of the output video. It should be within 0 to 10."
+)
+parser.add_argument(
+    "--bitrate",
+    type=int,
+    default=None,
+    help="The bitrate in b/s of the output video. The default is None (--quality is used).",
+)
+parser.add_argument(
+    "--skip-first", action="store_true", default=False, help="If it is True, the first caption will be skipped."
+)
+parser.add_argument(
+    "--break-after", type=float, default=0, help="Enable test mode to finish after the given seconds."
+)
+parser.add_argument("--output-params", type=str)
+args = parser.parse_args()
 
-    srt_text = open(args.srt).read()
+def burning(vid, srtt, out):
+    srt_text = open(srtt).read()
     srt = SRTReader().read(srt_text, lang="en")
     captions = srt.get_captions("en")
 
-    reader = imageio.get_reader(args.video)
+    reader = imageio.get_reader(vid)
     meta_data = reader.get_meta_data()
     pprint.pprint(meta_data)
     fps = meta_data["fps"]
@@ -64,9 +61,9 @@ if __name__ == "__main__":
     else:
         output_params = []
 
-    print("save to:", args.out)
+    print("save to:", out)
     writer = imageio.get_writer(
-        args.out,
+        out,
         codec=meta_data["codec"],
         fps=fps,
         pixelformat=args.pixelformat,
