@@ -9,8 +9,8 @@ import shlex
 import imageio
 import numpy as np
 import PIL.Image as Image
-from PIL import ImageDraw
-from PIL import ImageFont
+import PIL.ImageDraw as ImageDraw
+import PIL.ImageFont as ImageFont
 from pycaption import SRTReader
 from tqdm import tqdm
 
