@@ -2,6 +2,8 @@ import os
 from dotenv import load_dotenv
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from pyromod import listen
+from burn import burning
 
 load_dotenv()
 
@@ -13,9 +15,9 @@ Bot = Client(
 )
 
 START_TXT = """
-Hi {}, I'm Persian transcriber Bot.
+Hi {}, I'm Subtitle Muxer Bot.
 
-Send a media(video/audio) or a YouTube URL or path of a local file in your system.
+Send a video to start.
 """
 
 START_BTN = InlineKeyboardMarkup(
@@ -36,23 +38,22 @@ async def start(bot, update):
     )
 
 
-@Bot.on_message(filters.private & filters.text)
-async def from_yturl_or_local_file(_, m):
-    output_name = f"transcript{m.message_id}.txt"
-    await m.reply("Processing..")
-    transcribe(m.text, output_name)
-    await m.reply_document(output_name)
-
-
 @Bot.on_message(filters.private & filters.media)
-async def from_tg_files(_, m):
-    msg = await m.reply("Downloading..")
+async def mux(bot, m):
+    if m.document and not m.document.mime_type.startswith("video/"):
+        return
+    msg = await m.reply("Downloading video..")
     media = await m.download()
+    ask_srt = await bot.ask(m.chat.id,'`Send the srt file`', filters=filters.document)
     await msg.edit_text("Processing..")
-    output_name = os.path.basename(media).rsplit('.', 1)[0] + ".txt"
-    transcribe(media, output_name)
+    srt = await bot.download_media(message=ask_srt.document)
+    output_name = "muxed_" + os.path.basename(media)
+    burning(media, srt, output_name)
     await m.reply_document(output_name)
+    await msg.delete()
     os.remove(media)
+    os.remove(srt)
+    os.remove(output_name)
 
 
 Bot.run()
