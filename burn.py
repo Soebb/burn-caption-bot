@@ -8,7 +8,7 @@ import shlex
 
 import imageio
 import numpy as np
-from PIL import Image
+import PIL.Image as Image
 from PIL import ImageDraw
 from PIL import ImageFont
 from pycaption import SRTReader
