@@ -6,4 +6,5 @@ pyromod==1.4
 imageio==2.33.1
 imageio-ffmpeg==0.4.8
 tqdm==4.39.0
+Pillow
 numpy==1.22.0
